@@ -1,109 +1,292 @@
-# Job Market Intelligence System
+# 📊 Job Market Intelligence System
 
-A desktop application for aggregating, analyzing, and exporting job market data. Built with **Python**, **PyQt6**, **SQLite**, and **DSA** (sorting algorithms). Suitable as a portfolio project demonstrating full-stack desktop development, data pipelines, and algorithm implementation.
+A professional desktop application for scraping, sorting, analysing, and visualising job market data from multiple real-world sources — built as a Data Structures & Algorithms project using Python and PyQt6.
 
----
-
-## Features
-
-- **Multi-source job data**
-  - **Fetch All** – load 500+ jobs from Remotive + [RemoteOK](https://remoteok.com/api) in one click
-  - **Remotive** – ~50 jobs from [Remotive API](https://remotive.com/api/remote-jobs)
-  - **Indeed** – scrape by role and location (onsite, hybrid, remote)
-- **Adzuna** – fetch onsite/hybrid jobs (optional; set `ADZUNA_APP_ID` and `ADZUNA_APP_KEY`; [free signup](https://developer.adzuna.com/signup))
-- **Replace vs Append** – choose whether new data replaces or appends to existing jobs
-- **Sorting** – sort by any column using **Quick Sort**, **Merge Sort**, **Bubble Sort**, or **Tim Sort**, with execution time displayed
-- **Skill analysis** – top N skills across listings with bar chart (matplotlib)
-- **Salary & experience** – average salary by role and experience distribution with charts
-- **Filter & export** – filter by role, location, salary range, experience; **export filtered results to CSV** with save dialog
-- **Status bar** – total job count; progress feedback during fetch/scrape
-- **Error handling** – user-friendly messages for network/API failures and empty data
-
-**Note:** Data is **not** fetched automatically on a schedule. You get fresh data when you click **Fetch Remotive** or **Scrape Indeed**. For “live” data, run the app and use those buttons whenever you want an update.
+![Python](https://img.shields.io/badge/Python-3.11+-blue?style=flat-square&logo=python)
+![PyQt6](https://img.shields.io/badge/PyQt6-6.x-green?style=flat-square)
+![License](https://img.shields.io/badge/License-MIT-yellow?style=flat-square)
 
 ---
 
-## Tech Stack
+## 🖥️ Overview
 
-| Layer        | Technology                          |
-|-------------|--------------------------------------|
-| UI          | PyQt6 (Qt for Python)               |
-| Database    | SQLite (via `sqlite3`)              |
-| Data sources| Indeed (BeautifulSoup), Remotive API|
-| Analysis    | Collections, regex, matplotlib     |
-| Algorithms  | Custom Quick/Merge/Bubble + built-in Tim sort |
+This application demonstrates practical applications of DSA concepts including sorting algorithms, search and filter operations, and data structures — applied to real job market data fetched live from the internet.
+
+**What it does:**
+- Fetches hundreds of real jobs from 4 different sources in one click
+- Sorts them using 4 classic algorithms with live millisecond timing
+- Analyses skill demand, salary distributions, and experience levels
+- Displays everything in a professional dark dashboard with interactive charts
 
 ---
 
-## Setup
+## ✨ Features
 
-### Prerequisites
+### Job Listings Tab
+- One-click fetch from **JSearch (Indeed/LinkedIn)**, **Remotive**, **RemoteOK**, and **Adzuna**
+- Pause, Resume, Stop fetch mid-operation with checkpoint recovery
+- Click any row to open a **Job Detail panel** — full title, salary, skills, company
+- Sort by any column using your chosen algorithm with timing displayed
+- Live stat cards — Total Jobs · Remote · Onsite/Hybrid · Salary Coverage
+- Source donut chart and posted-date bar chart auto-load after every fetch
 
-- Python 3.9+
-- pip
+### Skill Analyzer Tab
+- Top 15 in-demand skills with job count and percentage coverage
+- Colour-gradient horizontal bar chart (darker → brighter by rank)
+- Auto-refreshes after every fetch
 
-### Install
+### Salary & Experience Tab
+- Hero stat cards — Average, Min, Max salary and jobs-with-salary count
+- Salary histogram bucketed by $20k ranges with coverage subtitle
+- Experience distribution shown as pie + bar chart side by side
+
+### Filter & Export Tab
+- Results update **live as you type** — no Apply button needed
+- Filter by role, location, salary range, and experience level
+- Filtered salary preview chart updates in real time
+- Export as **CSV** or **JSON**
+
+### Performance Analytics Tab *(DSA focus)*
+- Compare any two sorting algorithms head-to-head on current data
+- **Benchmark ALL 4** in one click — ranked chart with winner highlighted
+- Sort time timeline across last 30 runs, colour-coded by algorithm
+- Full history table: algorithm · column · time (ms) · job count
+
+---
+
+## 🔢 Sorting Algorithms Implemented
+
+| Algorithm | Best Case | Average | Worst Case | Stable |
+|---|---|---|---|---|
+| **Quick Sort** | O(n log n) | O(n log n) | O(n²) | No |
+| **Merge Sort** | O(n log n) | O(n log n) | O(n log n) | Yes |
+| **Bubble Sort** | O(n) | O(n²) | O(n²) | Yes |
+| **Tim Sort** | O(n) | O(n log n) | O(n log n) | Yes |
+
+Each sort is timed to the millisecond and logged to `data/sort_history.json`.
+
+---
+
+## 🛠️ Tech Stack
+
+| Layer | Technology |
+|---|---|
+| GUI Framework | PyQt6 |
+| Charts | Matplotlib |
+| Database | SQLite (Python built-in) |
+| HTTP Requests | `requests` |
+| Skill Extraction | Custom NLP module |
+| Language | Python 3.11+ |
+
+---
+
+## 📁 Project Structure
+
+```
+job-market-intelligence/
+│
+├── main.py                        # Entry point
+├── requirements.txt
+├── README.md
+│
+├── config/
+│   └── constants.py               # APP_NAME, SALARY_CURRENCY, etc.
+│
+├── database/
+│   └── db_manager.py              # SQLite manager with deduplication
+│
+├── ui/
+│   ├── main_window.py             # All 5 tabs — complete dashboard
+│   ├── workers.py                 # UnifiedFetchWorker (QThread)
+│   ├── chart_widget.py            # ChartCanvas with fullscreen support
+│   └── styles.py                  # Full dark stylesheet
+│
+├── sorting/
+│   └── sorting_algorithms.py      # All 4 algorithms + timer
+│
+├── analysis/
+│   ├── filter_search.py           # Multi-field job filter
+│   ├── skill_analyzer.py          # top_skills() NLP-based
+│   ├── salary_experience.py       # Salary + experience aggregation
+│   ├── export_reports.py          # CSV export
+│   ├── performance_tracker.py     # Sort history and averages
+│   ├── salary_normalizer.py       # Multi-currency → USD normalisation
+│   └── skills_extractor.py        # Skills from title + description
+│
+└── data/                          # Auto-created at runtime
+    ├── jobs.db                    # SQLite database
+    ├── sort_history.json          # Algorithm performance log
+    └── state.json                 # Pause/resume checkpoint
+```
+
+---
+
+## ⚙️ Installation
+
+### 1. Clone the repository
 
 ```bash
-# Clone or download the project, then:
-cd "Job Market Intelligence System"   # or your project folder
+git clone https://github.com/javairia772/job-market-intelligence.git
+cd job-market-intelligence
+```
+
+### 2. Create and activate a virtual environment
+
+```bash
+python -m venv venv
+
+# Windows
+venv\Scripts\activate
+
+# macOS / Linux
+source venv/bin/activate
+```
+
+### 3. Install dependencies
+
+```bash
 pip install -r requirements.txt
 ```
 
-### Run
+### 4. Run
 
 ```bash
 python main.py
 ```
 
-Run from the **project root** (where `main.py` lives) so the app finds the `data/` folder for the SQLite database.
+---
+
+## 🔑 API Keys Setup
+
+Two sources work immediately with no setup. Two optional sources require free API keys.
+
+### No key needed ✅
+
+| Source | Type |
+|---|---|
+| **Remotive** | Remote tech jobs |
+| **RemoteOK** | Remote jobs (high volume) |
 
 ---
 
-## Project Structure
+### JSearch — Indeed · LinkedIn · Glassdoor
 
-```
-├── main.py              # Entry point
-├── requirements.txt
-├── README.md
-├── config/
-│   ├── __init__.py
-│   └── constants.py    # App name, column indices, project root
-├── database/
-│   └── db_manager.py   # SQLite schema and CRUD
-├── ui/
-│   ├── main_window.py  # Tabs, tables, and event handlers
-│   ├── workers.py      # QThread workers for scrape/fetch
-│   ├── chart_widget.py # Embedded matplotlib charts
-│   └── styles.py       # Modern dark theme stylesheet
-├── scraper/
-│   ├── indeed_scraper.py   # Indeed scraping (optional append)
-│   ├── remotive_api.py     # Remotive API client
-│   ├── remoteok_api.py     # RemoteOK API (500+ jobs)
-│   └── adzuna_api.py       # Adzuna API (onsite/hybrid; requires API key)
-├── sorting/
-│   └── sorting_algorithms.py  # Quick, Merge, Bubble, Tim sort
-├── analysis/
-│   ├── filter_search.py
-│   ├── skill_analyzer.py
-│   ├── salary_experience.py  # Stats + chart figures (skills, salary, experience)
-│   └── export_reports.py
-└── data/               # Created at runtime
-    └── jobs.db
+JSearch is a RapidAPI service that provides structured job data aggregated from Indeed, LinkedIn and Glassdoor through a legitimate API. This replaces direct Indeed HTML scraping which is blocked with a 403 error.
+
+**Free tier: 200 requests / month**
+
+**Get your key:**
+1. Go to [rapidapi.com/letscrape-6bRBa3QguO5/api/jsearch](https://rapidapi.com/letscrape-6bRBa3QguO5/api/jsearch)
+2. Click **Subscribe to Test** → select the **Free** plan
+3. Copy your `X-RapidAPI-Key` from the right-hand code panel
+
+**Set the key:**
+
+```powershell
+# Windows — current session
+$env:JSEARCH_API_KEY = "your_key_here"
+python main.py
 ```
 
+```bash
+# macOS / Linux — current session
+export JSEARCH_API_KEY="your_key_here"
+python main.py
+```
+
+**Windows — permanent:**
+1. Start → search **"Edit the system environment variables"**
+2. Click **Environment Variables**
+3. Under User Variables → **New**
+4. Name: `JSEARCH_API_KEY` · Value: your key
+5. Restart terminal
+
 ---
 
-## Usage Tips
+### Adzuna — Onsite & Hybrid Jobs
 
-1. **First run** – Use **Fetch All Remote Jobs** for 500+ jobs instantly. **Scrape Indeed** may be rate-limited.
-2. **Indeed** – May be rate-limited or blocked; use sparingly. Prefer Remotive for reliable remote jobs.
-3. **Export** – Apply filters in the **Filter & Export** tab, then click **Export to CSV...** and choose a path.
-4. **Salary** – Shown in **USD** where available; otherwise «Not specified». Adzuna (country `gb`) may show GBP.
-5. **Adzuna (onsite/hybrid)** – Set `ADZUNA_APP_ID` and `ADZUNA_APP_KEY` in your environment, then restart the app to enable the button.
+**Free tier available**
+
+1. Go to [developer.adzuna.com](https://developer.adzuna.com)
+2. Sign up → Create an application → copy your **App ID** and **App Key**
+
+```powershell
+# Windows — current session
+$env:ADZUNA_APP_ID  = "your_app_id"
+$env:ADZUNA_APP_KEY = "your_app_key"
+python main.py
+```
+
+```bash
+# macOS / Linux — current session
+export ADZUNA_APP_ID="your_app_id"
+export ADZUNA_APP_KEY="your_app_key"
+python main.py
+```
+
+> If API keys are not set, those sources are skipped silently — Remotive and RemoteOK still load fine.
 
 ---
 
-## License
+## ⌨️ Keyboard Shortcuts
 
-Use for learning and portfolio. Respect Remotive’s [API terms](https://remotive.com/api-documentation) and Indeed’s robots.txt when scraping.
+| Shortcut | Action |
+|---|---|
+| `Ctrl+R` | Fetch all sources |
+| `Ctrl+F` | Jump to Filter tab |
+| `Ctrl+E` | Export current filtered data |
+
+---
+
+## 📝 .gitignore
+
+Add this file to your project root before pushing:
+
+```gitignore
+# Virtual environment
+venv/
+.venv/
+
+# Python cache
+__pycache__/
+*.pyc
+*.pyo
+
+# Runtime data — generated by the app, do not commit
+data/
+*.db
+sort_history.json
+state.json
+
+# API keys and secrets — NEVER commit these
+.env
+*.env
+
+# IDE
+.vscode/
+.idea/
+
+# OS files
+.DS_Store
+Thumbs.db
+```
+
+
+---
+
+## 👨‍💻 About
+
+**BS Computer Science — Semester 3**
+Data Structures & Algorithms — Semester Project
+
+This project applies core DSA concepts to a real-world problem:
+- **Sorting** — 4 algorithms benchmarked on live job data
+- **Search & Filter** — multi-field linear scan with live results
+- **Hash-based deduplication** — SQLite unique constraints prevent duplicate jobs
+- **Data aggregation** — grouping and counting for skill/salary analysis
+
+---
+
+## 📄 License
+
+MIT License — free to use, modify, and distribute with attribution.
